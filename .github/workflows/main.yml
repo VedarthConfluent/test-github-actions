@@ -19,8 +19,23 @@ jobs:
     - name: Run tests
       working-directory: ./docker
       run: |
-        python docker_build_test.py kafka/test -tag=classpath -type=jvm -u=https://downloads.apache.org/kafka/3.6.0/kafka_2.13-3.6.0.tgz
+        python docker_build_test.py kafka/test -tag=3.6.0 -type=jvm -u=https://downloads.apache.org/kafka/3.6.0/kafka_2.13-3.6.0.tgz
+    - name: Run Vulnerability scan
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: 'kafka/test:3.6.0'
+        format: 'table'
+        exit-code: '1'
+        ignore-unfixed: true
+        vuln-type: 'os,library'
+        severity: 'CRITICAL,HIGH'
+        output: scan.txt
+
     - uses: actions/upload-artifact@v3
       with:
         name: report.html
         path: docker/test/report.html
+    - uses: actions/upload-artifact@v3
+      with:
+        name: scan.txt
+        path: scan.txt
