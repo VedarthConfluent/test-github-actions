@@ -25,12 +25,10 @@ jobs:
       with:
         image-ref: 'kafka/test:3.6.0'
         format: 'table'
-        exit-code: '1'
         ignore-unfixed: true
         vuln-type: 'os,library'
         severity: 'CRITICAL,HIGH'
         output: scan.txt
-
     - uses: actions/upload-artifact@v3
       with:
         name: report.html

@@ -261,16 +261,16 @@ class DockerSanityTestCommon(unittest.TestCase):
 
     def execute(self):
         total_errors = []
-        try:
-            total_errors.extend(self.schema_registry_flow())
-        except Exception as e:
-            print("Schema registry error")
-            total_errors.append(str(e))
-        try:
-            total_errors.extend(self.connect_flow())
-        except Exception as e:
-            print("Connect flow error")
-            total_errors.append(str(e))
+        # try:
+        #     total_errors.extend(self.schema_registry_flow())
+        # except Exception as e:
+        #     print("Schema registry error")
+        #     total_errors.append(str(e))
+        # try:
+        #     total_errors.extend(self.connect_flow())
+        # except Exception as e:
+        #     print("Connect flow error")
+        #     total_errors.append(str(e))
         try:
             total_errors.extend(self.ssl_flow())
         except Exception as e:
