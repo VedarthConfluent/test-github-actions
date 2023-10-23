@@ -20,3 +20,7 @@ jobs:
       working-directory: ./docker
       run: |
         python docker_build_test.py kafka/test -tag=classpath -type=jvm -u=https://downloads.apache.org/kafka/3.6.0/kafka_2.13-3.6.0.tgz
+    - uses: actions/upload-artifact@v3
+      with:
+        name: report.html
+        path: docker/test/report.html

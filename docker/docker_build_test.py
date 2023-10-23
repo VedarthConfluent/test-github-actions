@@ -33,6 +33,7 @@ def build_jvm(image, tag, kafka_url):
 
 def run_jvm_tests(image, tag, kafka_url):
     subprocess.run(["wget", "-nv", "-O", "kafka.tgz", kafka_url])
+    subprocess.run(["ls"])
     subprocess.run(["tar", "xfz", "kafka.tgz", "-C", "./test/fixtures/kafka", "--strip-components", "1"])
     subprocess.run(["python3", "docker_sanity_test.py", f"{image}:{tag}", "jvm"], cwd="test")
 
