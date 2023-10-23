@@ -69,17 +69,19 @@ class DockerSanityTestCommon(unittest.TestCase):
             s = s.replace(old_string, new_string)
             f.write(s)
 
-    def create_topic(self, topic, topic_config):
-        command = ["./fixtures/kafka/bin/kafka-topics.sh", "--create", "--topic", topic]
-        command.extend(topic_config)
-        subprocess.run(command)
-        check_command = ["./fixtures/kafka/bin/kafka-topics.sh", "--list"]
-        check_command.extend(topic_config)
-        output = subprocess.check_output(check_command)
-        if topic in output.decode("utf-8"):
-            return True
-        return False
-    
+    def create_topic(self, topic):
+        kafka_admin = confluent_kafka.admin.AdminClient({"bootstrap.servers": "localhost:9092"})
+        new_topic = confluent_kafka.admin.NewTopic(topic, 1, 1)
+        kafka_admin.create_topics([new_topic,])
+        timeout = constants.CLIENT_TIMEOUT
+        while timeout > 0:
+            timeout -= 1
+            if topic not in kafka_admin.list_topics().topics:
+                time.sleep(1)
+                continue
+            return topic
+        return None
+
     def produce_message(self, topic, producer_config, key, value):
         producer = Producer(producer_config)
         producer.produce(topic, key=key, value=value)
@@ -152,7 +154,7 @@ class DockerSanityTestCommon(unittest.TestCase):
         print("Running Connect tests")
         errors = []
         try:
-            self.assertTrue(self.create_topic(constants.CONNECT_TEST_TOPIC, ["--bootstrap-servers", "localhost:9092"]))
+            self.assertEqual(self.create_topic(constants.CONNECT_TEST_TOPIC), constants.CONNECT_TEST_TOPIC)
         except AssertionError as e:
             errors.append(constants.CONNECT_ERROR_PREFIX + str(e))
             return errors
@@ -224,7 +226,7 @@ class DockerSanityTestCommon(unittest.TestCase):
         print("Running broker restart tests")
         errors = []
         try:
-            self.assertTrue(self.create_topic(constants.BROKER_RESTART_TEST_TOPIC, ["--bootstrap-server", "localhost:9092"]))
+            self.assertEqual(self.create_topic(constants.BROKER_RESTART_TEST_TOPIC), constants.BROKER_RESTART_TEST_TOPIC)
         except AssertionError as e:
             errors.append(constants.BROKER_RESTART_ERROR_PREFIX + str(e))
             return errors
