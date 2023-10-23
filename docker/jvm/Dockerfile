@@ -16,7 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
-ARG GOLANG_VERSION=1.21.1
+ARG GOLANG_VERSION=latest
 
 FROM golang:${GOLANG_VERSION} AS build-ub
 WORKDIR /build
