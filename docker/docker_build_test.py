@@ -33,7 +33,7 @@ def build_jvm(image, tag, kafka_url):
     shutil.rmtree("jvm/resources")
 
 def run_jvm_tests(image, tag, kafka_url):
-    requests.get(kafka_url, "kafka.tgz")
+    subprocess.run(["wget", "-nv", "-O", "kafka.tgz", kafka_url])
     subprocess.run(["tar", "xfz", "kafka.tgz", "-C", "./test/fixtures/kafka", "--strip-components", "1"])
     shutil.rmtree("kafka.tgz")
     subprocess.run(["python3", "docker_sanity_test.py", f"{image}:{tag}", "jvm"], cwd="test")
