@@ -37,6 +37,8 @@ def run_jvm_tests(image, tag, kafka_url):
     subprocess.run(["mkdir", "./test/fixtures/kafka"])
     subprocess.run(["tar", "xfz", "kafka.tgz", "-C", "./test/fixtures/kafka", "--strip-components", "1"])
     subprocess.run(["python3", "docker_sanity_test.py", f"{image}:{tag}", "jvm"], cwd="test")
+    subprocess.run(["rm", "kafka.tgz"])
+    shutil.rmtree("./test/fixtures/kafka")
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
