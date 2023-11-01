@@ -2,10 +2,23 @@ name: Docker build test
 
 on:
   workflow_dispatch:
+  inputs:
+      image_type:
+        type: choice
+        description: Which docker image to run the tests for
+        options: 
+          - [ "jvm" ]
+          - [ "native" ]
+          - [ "jvm", "native" ]
+      kafka_url:
+        required: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        image_type: ${{ github.event.inputs.image_type }}
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python 3.10
@@ -19,7 +32,7 @@ jobs:
     - name: Run tests
       working-directory: ./docker
       run: |
-        python docker_build_test.py kafka/test -tag=3.6.0 -type=jvm -u=https://downloads.apache.org/kafka/3.6.0/kafka_2.13-3.6.0.tgz
+        python docker_build_test.py kafka/test -tag=test -type=$image_type -u=${{ github.event.inputs.kafka_url }}
     - name: Run Vulnerability scan
       uses: aquasecurity/trivy-action@master
       with:
@@ -28,12 +41,12 @@ jobs:
         ignore-unfixed: true
         vuln-type: 'os,library'
         severity: 'CRITICAL,HIGH'
-        output: scan.txt
+        output: scan_$image_type.txt
     - uses: actions/upload-artifact@v3
       with:
-        name: report.html
-        path: docker/test/report.html
+        name: report_$image_type.html
+        path: docker/test/report_$image_type.html
     - uses: actions/upload-artifact@v3
       with:
-        name: scan.txt
-        path: scan.txt
+        name: scan_$image_type.txt
+        path: scan_$image_type.txt

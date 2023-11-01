@@ -184,7 +184,7 @@ if __name__ == "__main__":
         suite = loader.loadTestsFromTestCase(test_class)
         suites_list.append(suite)
     big_suite = unittest.TestSuite(suites_list)
-    outfile = open(f"report.html", "w")
+    outfile = open(f"report_{args.mode}.html", "w")
     runner = HTMLTestRunner.HTMLTestRunner(
                 stream=outfile,
                 title='Test Report',
