@@ -2,7 +2,7 @@ name: Docker build test
 
 on:
   workflow_dispatch:
-  inputs:
+    inputs:
       image_type:
         type: choice
         description: Which docker image to run the tests for
