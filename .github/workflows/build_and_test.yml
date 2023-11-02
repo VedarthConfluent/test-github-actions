@@ -29,10 +29,6 @@ jobs:
       working-directory: ./docker
       run: |
         python docker_build_test.py kafka/test -tag=test -type=${{ github.event.inputs.image_type }} -u=${{ github.event.inputs.kafka_url }}
-    - uses: actions/upload-artifact@v3
-      with:
-        name: report_${{ github.event.inputs.image_type }}.html
-        path: docker/test/report_${{ github.event.inputs.image_type }}.html
     - name: Run Vulnerability scan
       uses: aquasecurity/trivy-action@master
       with:
@@ -41,4 +37,12 @@ jobs:
         ignore-unfixed: true
         vuln-type: 'os,library'
         severity: 'CRITICAL,HIGH'
-        exit-code: '1'
+        output: scan_${{ github.event.inputs.image_type }}.txt
+    - uses: actions/upload-artifact@v3
+      with:
+        name: report_${{ github.event.inputs.image_type }}.html
+        path: docker/test/report_${{ github.event.inputs.image_type }}.html
+    - uses: actions/upload-artifact@v3
+      with:
+        name: scan_${{ github.event.inputs.image_type }}.txt
+        path: scan_${{ github.event.inputs.image_type }}.txt

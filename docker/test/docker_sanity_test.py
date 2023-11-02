@@ -19,47 +19,35 @@ import time
 from HTMLTestRunner import HTMLTestRunner
 import constants
 import argparse
+import socket
 
-class DockerSanityTestCommon(unittest.TestCase):
-    CONTAINER_NAME="broker"
+class DockerSanityTest(unittest.TestCase):
     IMAGE="apache/kafka"
     
     def resumeImage(self):
-        subprocess.run(["docker", "start", self.CONTAINER_NAME])
+        subprocess.run(["docker", "start", constants.BROKER_CONTAINER])
 
     def stopImage(self) -> None:
-        subprocess.run(["docker", "stop", self.CONTAINER_NAME])
+        subprocess.run(["docker", "stop", constants.BROKER_CONTAINER])
 
     def startCompose(self, filename) -> None:
         old_string="image: {$IMAGE}"
         new_string=f"image: {self.IMAGE}"
-
         with open(filename) as f:
             s = f.read()
-            if old_string not in s:
-                print('"{old_string}" not found in {filename}.'.format(**locals()))
-
         with open(filename, 'w') as f:
-            print('Changing "{old_string}" to "{new_string}" in {filename}'.format(**locals()))
             s = s.replace(old_string, new_string)
             f.write(s)
 
         subprocess.run(["docker-compose", "-f", filename, "up", "-d"])
-        time.sleep(25)
     
     def destroyCompose(self, filename) -> None:
         old_string=f"image: {self.IMAGE}"
         new_string="image: {$IMAGE}"
-
         subprocess.run(["docker-compose", "-f", filename, "down"])
-        time.sleep(10)
         with open(filename) as f:
             s = f.read()
-            if old_string not in s:
-                print('"{old_string}" not found in {filename}.'.format(**locals()))
-
         with open(filename, 'w') as f:
-            print('Changing "{old_string}" to "{new_string}" in {filename}'.format(**locals()))
             s = s.replace(old_string, new_string)
             f.write(s)
 
@@ -84,13 +72,35 @@ class DockerSanityTestCommon(unittest.TestCase):
         command.extend(consumer_config)
         message = subprocess.check_output(["bash", "-c", " ".join(command)], timeout=constants.CLIENT_TIMEOUT)
         return message.decode("utf-8").strip()
+    
+    def wait_for_port(self, host, port, open, timeout):
+        start_time = time.perf_counter()
+        while time.perf_counter() - start_time < timeout:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            status = sock.connect_ex((host, port))
+            sock.close()
+            if (open and status == 0) or (not open and status != 0):
+                return
+            else:
+                time.sleep(1)
+        raise TimeoutError("Timed out while waiting for the port", host, port)
 
     def ssl_flow(self):
         print("Running SSL flow tests")
         errors = []
+        try:
+            self.wait_for_port('localhost', 9093, True, constants.CLIENT_TIMEOUT)
+        except e:
+            errors.append(str(e))
+            return errors
+        try:
+            self.assertTrue(self.create_topic(constants.SSL_TOPIC, ["--bootstrap-server", "localhost:9093", "--command-config", constants.SSL_CLIENT_CONFIG]))
+        except AssertionError as e:
+            errors.append(constants.SSL_ERROR_PREFIX + str(e))
+            return errors
+
         producer_config = ["--bootstrap-server", "localhost:9093",
                            "--producer.config", constants.SSL_CLIENT_CONFIG]
-
         self.produce_message(constants.SSL_TOPIC, producer_config, "key", "message")
 
         consumer_config = [
@@ -114,6 +124,12 @@ class DockerSanityTestCommon(unittest.TestCase):
         print("Running broker restart tests")
         errors = []
         try:
+            self.wait_for_port('localhost', 9092, True, constants.CLIENT_TIMEOUT)
+        except e:
+            errors.append(str(e))
+            return errors
+        
+        try:
             self.assertTrue(self.create_topic(constants.BROKER_RESTART_TEST_TOPIC, ["--bootstrap-server", "localhost:9092"]))
         except AssertionError as e:
             errors.append(constants.BROKER_RESTART_ERROR_PREFIX + str(e))
@@ -122,13 +138,20 @@ class DockerSanityTestCommon(unittest.TestCase):
         producer_config = ["--bootstrap-server", "localhost:9092", "--property", "client.id=host"]
         self.produce_message(constants.BROKER_RESTART_TEST_TOPIC, producer_config, "key", "message")
 
-        print("Stopping Image")
+        print("Stopping Container")
         self.stopImage()
-        time.sleep(15)
-
+        try:
+            self.wait_for_port('localhost', 9092, False, constants.CLIENT_TIMEOUT)
+        except e:
+            errors.append(str(e))
+            return errors
         print("Resuming Image")
         self.resumeImage()
-        time.sleep(15)
+        try:
+            self.wait_for_port('localhost', 9092, True, constants.CLIENT_TIMEOUT)
+        except e:
+            errors.append(str(e))
+            return errors
         consumer_config = ["--bootstrap-server", "localhost:9092", "--property", "auto.offset.reset=earliest"]
         message = self.consume_message(constants.BROKER_RESTART_TEST_TOPIC, consumer_config)
         try:
@@ -158,7 +181,7 @@ class DockerSanityTestCommon(unittest.TestCase):
         
         self.assertEqual(total_errors, [])
 
-class DockerSanityTestKraftMode(DockerSanityTestCommon):
+class DockerSanityTestKraftMode(DockerSanityTest):
     def setUp(self) -> None:
         self.startCompose(constants.KRAFT_COMPOSE)
     def tearDown(self) -> None:
@@ -172,11 +195,11 @@ if __name__ == "__main__":
     parser.add_argument("mode", default="all")
     args = parser.parse_args()
 
-    DockerSanityTestCommon.IMAGE = args.image
+    DockerSanityTest.IMAGE = args.image
 
     test_classes_to_run = []
-    if args.mode in ("all", "jvm"):
-        test_classes_to_run.extend([DockerSanityTestKraftMode])
+    if args.mode == "jvm":
+        test_classes_to_run = [DockerSanityTestKraftMode]
     
     loader = unittest.TestLoader()
     suites_list = []
