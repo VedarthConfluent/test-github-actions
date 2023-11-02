@@ -32,7 +32,7 @@ jobs:
     - name: Run Vulnerability scan
       uses: aquasecurity/trivy-action@master
       with:
-        image-ref: 'kafka/test:3.6.0'
+        image-ref: 'kafka/test:test'
         format: 'table'
         ignore-unfixed: true
         vuln-type: 'os,library'
