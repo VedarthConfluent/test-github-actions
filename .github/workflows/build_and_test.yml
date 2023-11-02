@@ -37,12 +37,12 @@ jobs:
         ignore-unfixed: true
         vuln-type: 'os,library'
         severity: 'CRITICAL,HIGH'
-        output: scan.txt
+        output: scan_${{ github.event.inputs.image_type }}.txt
     - uses: actions/upload-artifact@v3
       with:
-        name: report.html
-        path: docker/test/report.html
+        name: report_${{ github.event.inputs.image_type }}.html
+        path: docker/test/report_${{ github.event.inputs.image_type }}.html
     - uses: actions/upload-artifact@v3
       with:
-        name: scan.txt
-        path: scan.txt
+        name: scan_${{ github.event.inputs.image_type }}.txt
+        path: scan_${{ github.event.inputs.image_type }}.txt
