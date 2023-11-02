@@ -22,9 +22,11 @@ ZOOKEEPER_COMPOSE="fixtures/zookeeper/docker-compose.yml"
 
 CLIENT_TIMEOUT=40
 
+SSL_FLOW_TESTS="SSL Flow Tests"
 SSL_CLIENT_CONFIG="./fixtures/secrets/client-ssl.properties"
 SSL_TOPIC="test-topic-ssl"
 
+BROKER_RESTART_TESTS="Broker Restart Tests"
 BROKER_CONTAINER="broker"
 BROKER_RESTART_TEST_TOPIC="test-topic-broker-restart"
 
