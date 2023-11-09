@@ -38,6 +38,7 @@ jobs:
         vuln-type: 'os,library'
         severity: 'CRITICAL,HIGH'
         output: scan_report_${{ github.event.inputs.image_type }}.txt
+        exit-code: '1'
     - name: Upload test report
       if: always()
       uses: actions/upload-artifact@v3

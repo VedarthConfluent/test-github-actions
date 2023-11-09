@@ -129,7 +129,7 @@ class DockerSanityTest(unittest.TestCase):
             errors.append(test.constants.BROKER_RESTART_ERROR_PREFIX + str(e))
             return errors
         try:
-            self.assertEqual(message, "key:message1")
+            self.assertEqual(message, "key:message")
         except AssertionError as e:
             errors.append(test.constants.BROKER_RESTART_ERROR_PREFIX + str(e))
         if errors:
