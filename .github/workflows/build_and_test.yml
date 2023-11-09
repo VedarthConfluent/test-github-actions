@@ -24,11 +24,12 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r docker/requirements.txt
-    - name: Run tests
+    - name: Build image and run tests
       working-directory: ./docker
       run: |
         python docker_build_test.py kafka/test -tag=test -type=${{ github.event.inputs.image_type }} -u=${{ github.event.inputs.kafka_url }}
     - name: Run CVE scan
+      if: always()
       uses: aquasecurity/trivy-action@master
       with:
         image-ref: 'kafka/test:test'
@@ -36,7 +37,7 @@ jobs:
         ignore-unfixed: true
         vuln-type: 'os,library'
         severity: 'CRITICAL,HIGH'
-        output: scan_${{ github.event.inputs.image_type }}.txt
+        output: scan_report_${{ github.event.inputs.image_type }}.txt
     - name: Upload test report
       if: always()
       uses: actions/upload-artifact@v3
