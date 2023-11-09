@@ -8,7 +8,6 @@ on:
         description: Which docker image to run the tests for
         options: 
           - "jvm"
-          - "native"
       kafka_url:
         required: true
 
@@ -24,12 +23,12 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r docker/test/requirements.txt
+        pip install -r docker/requirements.txt
     - name: Run tests
       working-directory: ./docker
       run: |
         python docker_build_test.py kafka/test -tag=test -type=${{ github.event.inputs.image_type }} -u=${{ github.event.inputs.kafka_url }}
-    - name: Run Vulnerability scan
+    - name: Run CVE scan
       uses: aquasecurity/trivy-action@master
       with:
         image-ref: 'kafka/test:test'
@@ -38,11 +37,15 @@ jobs:
         vuln-type: 'os,library'
         severity: 'CRITICAL,HIGH'
         output: scan_${{ github.event.inputs.image_type }}.txt
-    - uses: actions/upload-artifact@v3
+    - name: Upload test report
+      if: always()
+      uses: actions/upload-artifact@v3
       with:
         name: report_${{ github.event.inputs.image_type }}.html
-        path: docker/test/report_${{ github.event.inputs.image_type }}.html
-    - uses: actions/upload-artifact@v3
+        path: docker/report_${{ github.event.inputs.image_type }}.html
+    - name: Upload CVE scan report
+      if: always()
+      uses: actions/upload-artifact@v3
       with:
-        name: scan_${{ github.event.inputs.image_type }}.txt
-        path: scan_${{ github.event.inputs.image_type }}.txt
+        name: scan_report_${{ github.event.inputs.image_type }}.txt
+        path: scan_report_${{ github.event.inputs.image_type }}.txt
