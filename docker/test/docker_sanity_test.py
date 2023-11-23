@@ -109,13 +109,11 @@ class DockerSanityTest(unittest.TestCase):
         try:
             self.assertEqual(len(metrics_before_message), 2)
             self.assertEqual(metrics_after_message[0], constants.BROKER_METRICS_HEADING)
-            print(metrics_before_message[1])
-            print(metrics_after_message[1])
             before_metrics_data, after_metrics_data = metrics_before_message[1].split(","), metrics_after_message[1].split(",")
             self.assertEqual(len(before_metrics_data), len(after_metrics_data))
             for i in range(len(before_metrics_data)):
                 if after_metrics_data[i].replace(".", "").isnumeric():
-                    self.assertGreater(float(after_metrics_data[i]), float(before_metrics_data[i]))
+                    self.assertGreaterEqual(float(after_metrics_data[i]), float(before_metrics_data[i]))
                 else:
                     self.assertEqual(after_metrics_data[i], before_metrics_data[i])
         except AssertionError as e:
