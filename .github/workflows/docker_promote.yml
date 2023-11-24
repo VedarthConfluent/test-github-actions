@@ -27,6 +27,7 @@ on:
 
 jobs:
   promote:
+    if: github.repository == 'apache/kafka'
     runs-on: ubuntu-latest
     steps:
     - name: Login to Docker Hub
