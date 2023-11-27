@@ -23,7 +23,7 @@ import os
 
 class DockerSanityTest(unittest.TestCase):
     IMAGE="apache/kafka"
-    FIXTURES_DIR="./"
+    FIXTURES_DIR="."
     
     def resume_container(self):
         subprocess.run(["docker", "start", constants.BROKER_CONTAINER])

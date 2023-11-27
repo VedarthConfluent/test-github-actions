@@ -20,6 +20,7 @@ FROM golang:latest AS build-ub
 WORKDIR /build
 RUN useradd --no-log-init --create-home --shell /bin/bash appuser
 COPY --chown=appuser:appuser resources/ub/ ./
+
 # Generate utility belt (ub executable) for dealing with env variables
 RUN go build -ldflags="-w -s" ./ub.go
 USER appuser
