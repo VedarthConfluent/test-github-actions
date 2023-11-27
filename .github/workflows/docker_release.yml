@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Prepare RC Docker Image
+name: Build and Push RC Docker Image
 
 on:
   workflow_dispatch:
