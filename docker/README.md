@@ -24,9 +24,16 @@ Bulding image and running tests using github actions
 This is the recommended way to build, test and get a CVE report for the docker image.
 Just choose the image type and provide kafka url to `Docker build test` workflow. It will generate a test report and CVE report that can be shared to the community.
 
+kafka-url - This is the url to download kafka tarball from. For example kafka tarball url from (https://archive.apache.org/dist/kafka). For building RC image this will be an RC tarball url.
+
+image-type - This is the type of image that we intend to build. This will be dropdown menu type selection in the workflow. `jvm` image type is for official docker image (to be hosted on apache/kafka) as described in [KIP-975](https://cwiki.apache.org/confluence/display/KAFKA/KIP-975%3A+Docker+Image+for+Apache+Kafka)
+
+
 Creating a release
 ------------------
-`docker_release.py` provides an interactive way to build multi arch image and publish it to a docker registry.
+- `docker_release.py` script builds a multi architecture image and pushes it to provided docker registry.
+- Ensure you are logged in to the docker registry before triggering the script.
+- kafka binary tarball url along with image name (in the format `<registry>/<namespace>/<image_name>:<image_tag>`) and type is needed to build the image. For detailed usage description check `python docker_release.py --help`.
 
 Promoting a release
 -------------------
@@ -36,7 +43,7 @@ Using the image in a docker container
 -------------------------------------
 - The image uses the kafka downloaded from provided kafka url
 - The image can be run in a container in default mode by running
-`docker run <image-name:tag> -p 9092:9092`
+`docker run -p 9092:9092 <image-name:tag>`
 - Default configs run kafka in kraft mode with plaintext listners on 9092 port.
 - Default configs can be overriden by user using 2 ways:-
     - By mounting folder containing property files
@@ -52,7 +59,7 @@ Using the image in a docker container
             - For abc.def, use KAFKA_ABC_DEF
             - For abc-def, use KAFKA_ABC___DEF
             - For abc_def, use KAFKA_ABC__DEF
-- Hence order of precedence of properties is the follwing:-
+- Hence order of precedence of properties is the following:-
     - Env variable (highest)
     - File input
     - Default (lowest)
