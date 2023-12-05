@@ -139,7 +139,7 @@ class DockerSanityTest(unittest.TestCase):
         ]
         message = self.consume_message(topic, consumer_config)
         try:
-            self.assertEqual(message, "key:message")
+            self.assertEqual(message, "key:message1")
         except AssertionError as e:
             errors.append(test_error_prefix + str(e))
         
