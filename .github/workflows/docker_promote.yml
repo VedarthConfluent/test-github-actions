@@ -36,7 +36,7 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
     - name: Copy RC Image to apache/kafka
-      uses: imjasonh/setup-crane@v0.1
+      uses: iarekylew00t/regctl-installer@v1
     - run: |
-        crane copy ${{ github.event.inputs.rc_docker_image }} ${{ github.event.inputs.promoted_docker_image }}
+        regctl image copy ${{ github.event.inputs.rc_docker_image }} ${{ github.event.inputs.promoted_docker_image }}
 
