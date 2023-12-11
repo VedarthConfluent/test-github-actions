@@ -23,6 +23,7 @@ on:
         description: Docker image type to be built and pushed
         options: 
           - "jvm"
+          - "native"
       rc_docker_image:
         description: RC docker image that needs to be built and pushed to Dockerhub
         required: true
