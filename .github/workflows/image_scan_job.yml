@@ -1,0 +1,26 @@
+name: Docker Image CVE scanner
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        image: [vedarthconfluent/vedarth-kafka-test:latest, vedarthconfluent/vedarth-kafka-test:3.6.0-release, vedarthconfluent/vedarth-kafka-test:3.6.0-release-actions]
+    steps:
+      - name: Run CVE scan
+        uses: aquasecurity/trivy-action@master
+        if: always()
+        with:
+          image-ref: 'kafka/test:test'
+          format: 'table'
+          severity: 'CRITICAL,HIGH'
+          output: scan_report_${{ matrix.image }}.txt
+          exit-code: '1'
+      - name: Upload CVE scan report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: scan_report_${{ matrix.image }}.txt
+          path: scan_report_${{ matrix.image }}.txt
