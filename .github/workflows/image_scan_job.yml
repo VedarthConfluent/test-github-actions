@@ -16,11 +16,11 @@ jobs:
           image-ref: vedarthconfluent/vedarth-kafka-test:${{ matrix.tag }}
           format: 'table'
           severity: 'CRITICAL,HIGH'
-          output: scan_report_${{ matrix.tag }}.txt
+          output: scan_report_jvm_${{ matrix.tag }}.txt
           exit-code: '1'
       - name: Upload CVE scan report
         if: always()
         uses: actions/upload-artifact@v3
         with:
-          name: scan_report_${{ matrix.tag }}.txt
-          path: scan_report_${{ matrix.tag }}.txt
+          name: scan_report_jvm_${{ matrix.tag }}.txt
+          path: scan_report_jvm_${{ matrix.tag }}.txt
