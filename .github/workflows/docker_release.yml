@@ -53,8 +53,8 @@ jobs:
     - name: Login to Docker Hub
       uses: docker/login-action@v3
       with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        username: ${{ secrets.KRISH_DOCKERHUB_USERNAME }}
+        password: ${{ secrets.KRISH_DOCKERHUB_TOKEN }}
     - name: Release the RC docker image
       run: |
         python docker/docker_release.py ${{ github.event.inputs.rc_docker_image }} --kafka-url ${{ github.event.inputs.kafka_url }} --image-type ${{ github.event.inputs.image_type }}
