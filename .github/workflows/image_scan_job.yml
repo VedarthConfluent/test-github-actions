@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        image: [vedarthconfluent/vedarth-kafka-test:latest, vedarthconfluent/vedarth-kafka-test:3.6.0-release, vedarthconfluent/vedarth-kafka-test:3.6.0-release-actions]
+        image: ['vedarthconfluent/vedarth-kafka-test:latest', 'vedarthconfluent/vedarth-kafka-test:3.6.0-release', 'vedarthconfluent/vedarth-kafka-test:3.6.0-release-actions']
     steps:
       - name: Run CVE scan
         uses: aquasecurity/trivy-action@master
