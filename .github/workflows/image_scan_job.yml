@@ -1,7 +1,7 @@
 name: Docker Image CVE scanner
 on:
   schedule:
-    - cron: '*/5 * * * *'
+    - cron: '30 3 * * *'
 jobs:
   scan_jvm:
     runs-on: ubuntu-latest
