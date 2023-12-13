@@ -7,21 +7,20 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        image: ['vedarthconfluent/vedarth-kafka-test:latest', 'vedarthconfluent/vedarth-kafka-test:3.6.0-release', 'vedarthconfluent/vedarth-kafka-test:3.6.0-release-actions']
+        tag: ['latest', '3.6.0-release', '3.6.0-release-actions']
     steps:
-      - uses: actions/checkout@v3
       - name: Run CVE scan
         uses: aquasecurity/trivy-action@master
         if: always()
         with:
-          image-ref: ${{ matrix.image }}
+          image-ref: vedarthconfluent/vedarth-kafka-test:${{ matrix.tag }}
           format: 'table'
           severity: 'CRITICAL,HIGH'
-          output: scan_report_${{ matrix.image }}.txt
+          output: scan_report_${{ matrix.tag }}.txt
           exit-code: '1'
       - name: Upload CVE scan report
         if: always()
         uses: actions/upload-artifact@v3
         with:
-          name: scan_report_${{ matrix.image }}.txt
-          path: scan_report_${{ matrix.image }}.txt
+          name: scan_report_${{ matrix.tag }}.txt
+          path: scan_report_${{ matrix.tag }}.txt
