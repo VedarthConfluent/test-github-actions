@@ -3,7 +3,7 @@ on:
   schedule:
     - cron: '*/5 * * * *'
 jobs:
-  scan:
+  scan_jvm:
     runs-on: ubuntu-latest
     strategy:
       matrix:
