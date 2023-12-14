@@ -40,11 +40,11 @@ import argparse
 
 from common import execute, build_image_runner
 
-def build_push_jvm(image, kafka_url):
+def build_push_jvm(image, kafka_url, image_type):
     try:
         create_builder()
         build_image_runner(f"docker buildx build -f $DOCKER_FILE --build-arg kafka_url={kafka_url} --build-arg build_date={date.today()} --push \
-              --platform linux/amd64,linux/arm64 --tag {image} $DOCKER_DIR")
+              --platform linux/amd64,linux/arm64 --tag {image} $DOCKER_DIR", image_type)
     except:
         raise SystemError("Docker image push failed")
     finally:
@@ -70,6 +70,5 @@ if __name__ == "__main__":
     print(f"Docker image of type {args.image_type} containing kafka downloaded from {args.kafka_url} will be pushed to {args.image}")
 
     print("Building and pushing the image")
-    if args.image_type == "jvm":
-        build_push_jvm(args.image, args.kafka_url)
+    build_push_jvm(args.image, args.kafka_url, args.image_tpe)
     print(f"Image has been pushed to {args.image}")
