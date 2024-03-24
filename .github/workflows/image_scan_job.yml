@@ -2,18 +2,19 @@ name: Docker Image CVE scanner
 on:
   schedule:
     - cron: '30 3 * * *'
+  workflow_dispatch:
 jobs:
   scan_jvm:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        tag: ['latest', '3.6.0-release', '3.6.0-release-actions']
+        tag: ['latest', '3.7.0']
     steps:
       - name: Run CVE scan
         uses: aquasecurity/trivy-action@master
         if: always()
         with:
-          image-ref: vedarthconfluent/vedarth-kafka-test:${{ matrix.tag }}
+          image-ref: apache/kafka:${{ matrix.tag }}
           format: 'table'
           severity: 'CRITICAL,HIGH'
           output: scan_report_jvm_${{ matrix.tag }}.txt
