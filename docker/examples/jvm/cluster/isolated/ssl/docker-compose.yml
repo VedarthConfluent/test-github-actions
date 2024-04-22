@@ -31,6 +31,11 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
+      KAFKA_AUTHORIZER_CLASS_NAME: org.apache.kafka.metadata.authorizer.StandardAuthorizer
+      KAFKA_SUPER_USERS: User:ANONYMOUS;User:admin;User:CN=localhost, OU=kafka, O=apache
+      KAFKA_ALLOW_EVERYONE_IF_NO_ACL.FOUND: false
+      KAFKA_ACL.DEFAULT.DENIED: true
+      KAFKA_LOG4J_LOGGERS: "org.apache.kafka.controller=DEBUG,kafka=DEBUG,org.apache.kafka=DEBUG,kafka.authorizer.logger=DEBUG"
   
   controller-2:
     image: apache/kafka:latest
@@ -47,7 +52,11 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
-    
+      KAFKA_AUTHORIZER_CLASS_NAME: org.apache.kafka.metadata.authorizer.StandardAuthorizer
+      KAFKA_SUPER_USERS: User:ANONYMOUS;User:admin;User:CN=localhost, OU=kafka, O=apache
+      KAFKA_ALLOW_EVERYONE_IF_NO_ACL.FOUND: false
+      KAFKA_ACL.DEFAULT.DENIED: true
+      KAFKA_LOG4J_LOGGERS: "org.apache.kafka.controller=DEBUG,kafka=DEBUG,org.apache.kafka=DEBUG,kafka.authorizer.logger=DEBUG"
   controller-3:
     image: apache/kafka:latest
     environment:
@@ -63,7 +72,11 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
-
+      KAFKA_AUTHORIZER_CLASS_NAME: org.apache.kafka.metadata.authorizer.StandardAuthorizer
+      KAFKA_SUPER_USERS: User:ANONYMOUS;User:admin;User:CN=localhost, OU=kafka, O=apache
+      KAFKA_ALLOW_EVERYONE_IF_NO_ACL.FOUND: false
+      KAFKA_ACL.DEFAULT.DENIED: true
+      KAFKA_LOG4J_LOGGERS: "org.apache.kafka.controller=DEBUG,kafka=DEBUG,org.apache.kafka=DEBUG,kafka.authorizer.logger=DEBUG"
   kafka-1:
     image: apache/kafka:latest
     hostname: kafka-1
@@ -94,7 +107,11 @@ services:
       KAFKA_SSL_TRUSTSTORE_FILENAME: 'kafka.truststore.jks'
       KAFKA_SSL_TRUSTSTORE_CREDENTIALS: 'kafka_truststore_creds'
       KAFKA_SSL_CLIENT_AUTH: 'required'
-      KAFKA_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: ""
+      KAFKA_AUTHORIZER_CLASS_NAME: org.apache.kafka.metadata.authorizer.StandardAuthorizer
+      KAFKA_SUPER_USERS: User:ANONYMOUS;User:admin;User:CN=localhost, OU=kafka, O=apache
+      KAFKA_ALLOW_EVERYONE_IF_NO_ACL.FOUND: false
+      KAFKA_ACL.DEFAULT.DENIED: true
+      KAFKA_LOG4J_LOGGERS: "org.apache.kafka.controller=DEBUG,kafka=DEBUG,org.apache.kafka=DEBUG,kafka.authorizer.logger=DEBUG"
     depends_on:
       - controller-1
       - controller-2
@@ -131,6 +148,11 @@ services:
       KAFKA_SSL_TRUSTSTORE_CREDENTIALS: 'kafka_truststore_creds'
       KAFKA_SSL_CLIENT_AUTH: 'required'
       KAFKA_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: ""
+      KAFKA_AUTHORIZER_CLASS_NAME: org.apache.kafka.metadata.authorizer.StandardAuthorizer
+      KAFKA_SUPER_USERS: User:ANONYMOUS;User:admin;User:CN=localhost, OU=kafka, O=apache
+      KAFKA_ALLOW_EVERYONE_IF_NO_ACL.FOUND: false
+      KAFKA_ACL.DEFAULT.DENIED: true
+      KAFKA_LOG4J_LOGGERS: "org.apache.kafka.controller=DEBUG,kafka=DEBUG,org.apache.kafka=DEBUG,kafka.authorizer.logger=DEBUG"
     depends_on:
       - controller-1
       - controller-2
@@ -167,6 +189,11 @@ services:
       KAFKA_SSL_TRUSTSTORE_CREDENTIALS: 'kafka_truststore_creds'
       KAFKA_SSL_CLIENT_AUTH: 'required'
       KAFKA_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: ""
+      KAFKA_AUTHORIZER_CLASS_NAME: org.apache.kafka.metadata.authorizer.StandardAuthorizer
+      KAFKA_SUPER_USERS: User:ANONYMOUS;User:admin;User:CN=localhost, OU=kafka, O=apache
+      KAFKA_ALLOW_EVERYONE_IF_NO_ACL.FOUND: false
+      KAFKA_ACL.DEFAULT.DENIED: true
+      KAFKA_LOG4J_LOGGERS: "org.apache.kafka.controller=DEBUG,kafka=DEBUG,org.apache.kafka=DEBUG,kafka.authorizer.logger=DEBUG"
     depends_on:
       - controller-1
       - controller-2
