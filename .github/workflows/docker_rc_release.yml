@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Build and Push RC Docker Image
+name: Build and Push Release Candidate Docker Image
 
 on:
   workflow_dispatch:
@@ -23,8 +23,9 @@ on:
         description: Docker image type to be built and pushed
         options: 
           - "jvm"
+          - "native"
       rc_docker_image:
-        description: RC docker image that needs to be built and pushed to Dockerhub
+        description: RC docker image that needs to be built and pushed to Dockerhub (Example:- apache/kafka:3.6.0-rc0)
         required: true
       kafka_url:
         description: Kafka url to be used to build the docker image
@@ -52,9 +53,8 @@ jobs:
     - name: Login to Docker Hub
       uses: docker/login-action@v3
       with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        username: ${{ secrets.KRISH_DOCKERHUB_USERNAME }}
+        password: ${{ secrets.KRISH_DOCKERHUB_TOKEN }}
     - name: Release the RC docker image
       run: |
         python docker/docker_release.py ${{ github.event.inputs.rc_docker_image }} --kafka-url ${{ github.event.inputs.kafka_url }} --image-type ${{ github.event.inputs.image_type }}
-
