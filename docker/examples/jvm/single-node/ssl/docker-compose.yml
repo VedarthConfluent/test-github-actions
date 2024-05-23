@@ -26,16 +26,16 @@ services:
       - ../../../fixtures/secrets:/etc/kafka/secrets
     environment:
       KAFKA_NODE_ID: 1
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'SSL:SASL_SSL,CONTROLLER:PLAINTEXT,INTERNAL:SASL_SSL'
-      KAFKA_ADVERTISED_LISTENERS: 'SSL://localhost:9093,INTERNAL://broker:19093'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'SSL:SSL,CONTROLLER:PLAINTEXT,SSL-INTERNAL:SSL'
+      KAFKA_ADVERTISED_LISTENERS: 'SSL://localhost:9093,SSL-INTERNAL://broker:19093'
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_PROCESS_ROLES: 'broker,controller'
       KAFKA_CONTROLLER_QUORUM_VOTERS: '1@broker:29093'
-      KAFKA_LISTENERS: 'SSL://:9093,CONTROLLER://:29093,INTERNAL://:19093'
-      KAFKA_INTER_BROKER_LISTENER_NAME: 'INTERNAL'
+      KAFKA_LISTENERS: 'SSL://:9093,CONTROLLER://:29093,SSL-INTERNAL://:19093'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'SSL-INTERNAL'
       KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
       KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
       CLUSTER_ID: '4L6g3nShT-eMCtK--X86sw'
@@ -46,25 +46,3 @@ services:
       KAFKA_SSL_TRUSTSTORE_CREDENTIALS: 'kafka_truststore_creds'
       KAFKA_SSL_CLIENT_AUTH: 'required'
       KAFKA_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: ""
-      KAFKA_AUTHORIZER_CLASS_NAME: org.apache.kafka.metadata.authorizer.StandardAuthorizer
-      KAFKA_SUPER_USERS: User:ANONYMOUS;User:admin;User:CN=Unknown, OU=Unknown, O=Unknown, L=Unknown, ST=Unknown, C=Unknown
-      KAFKA_ALLOW_EVERYONE_IF_NO_ACL.FOUND: false
-      KAFKA_ACL.DEFAULT.DENIED: true
-      KAFKA_LOG4J_LOGGERS: "org.apache.kafka.controller=DEBUG,kafka=DEBUG,org.apache.kafka=DEBUG,kafka.authorizer.logger=DEBUG"
-      KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: PLAIN
-      KAFKA_SASL_ENABLED_MECHANISMS: PLAIN
-      KAFKA_LISTENER_NAME_SSL_PLAIN_SASL_JAAS_CONFIG: org.apache.kafka.common.security.plain.PlainLoginModule required \
-                                                          username="admin" \
-                                                          password="admin-secret" \
-                                                          user_admin="admin-secret" \
-                                                          user_Alice="alice-secret" \
-                                                          user_Emily="emily-secret" \
-                                                          user_Bob="bob-secret";
-      KAFKA_LISTENER_NAME_INTERNAL_PLAIN_SASL_JAAS_CONFIG: org.apache.kafka.common.security.plain.PlainLoginModule required \
-                                                          username="admin" \
-                                                          password="admin-secret" \
-                                                          user_admin="admin-secret" \
-                                                          user_Alice="alice-secret" \
-                                                          user_Emily="emily-secret" \
-                                                          user_Bob="bob-secret";
-

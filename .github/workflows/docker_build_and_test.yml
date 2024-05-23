@@ -13,30 +13,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Build and Push RC Docker Image
+name: Docker Build Test
 
 on:
   workflow_dispatch:
     inputs:
       image_type:
         type: choice
-        description: Docker image type to be built and pushed
+        description: Docker image type to build and test
         options: 
           - "jvm"
-      rc_docker_image:
-        description: RC docker image that needs to be built and pushed to Dockerhub
-        required: true
       kafka_url:
         description: Kafka url to be used to build the docker image
         required: true
 
 jobs:
-  release:
-    if: github.repository == 'VedarthConfluent/test-github-actions'
+  build:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v3
     - name: Set up Python 3.10
       uses: actions/setup-python@v3
       with:
@@ -45,16 +40,27 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r docker/requirements.txt
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v3
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-    - name: Login to Docker Hub
-      uses: docker/login-action@v3
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
-    - name: Release the RC docker image
+    - name: Build image and run tests
+      working-directory: ./docker
       run: |
-        python docker/docker_release.py ${{ github.event.inputs.rc_docker_image }} --kafka-url ${{ github.event.inputs.kafka_url }} --image-type ${{ github.event.inputs.image_type }}
-
+        python docker_build_test.py kafka/test -tag=test -type=${{ github.event.inputs.image_type }} -u=${{ github.event.inputs.kafka_url }}
+    - name: Run CVE scan
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: 'kafka/test:test'
+        format: 'table'
+        severity: 'CRITICAL,HIGH'
+        output: scan_report_${{ github.event.inputs.image_type }}.txt
+        exit-code: '1'
+    - name: Upload test report
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: report_${{ github.event.inputs.image_type }}.html
+        path: docker/test/report_${{ github.event.inputs.image_type }}.html
+    - name: Upload CVE scan report
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: scan_report_${{ github.event.inputs.image_type }}.txt
+        path: scan_report_${{ github.event.inputs.image_type }}.txt

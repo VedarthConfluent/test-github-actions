@@ -13,32 +13,33 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Promote Release Candidate Docker Image
-
+name: Docker Image CVE Scanner
 on:
+  schedule:
+    # This job will run at 3:30 UTC daily
+    - cron: '30 3 * * *'
   workflow_dispatch:
-    inputs:
-      rc_docker_image:
-        description: RC docker image that needs to be promoted (Example:- apache/kafka:3.6.0-rc0)
-        required: true
-      promoted_docker_image:
-        description: Docker image name of the promoted image (Example:- apache/kafka:3.6.0)
-        required: true
-
 jobs:
-  promote:
+  scan_jvm:
     if: github.repository == 'apache/kafka'
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # This is an array of supported tags. Make sure this array only contains the supported tags
+        supported_image_tag: ['latest', '3.7.0']
     steps:
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v3
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-    - name: Login to Docker Hub
-      uses: docker/login-action@v3
-      with:
-        username: ${{ secrets.DOCKERHUB_USER }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
-    - name: Copy RC Image to promoted image
-      run: |
-        docker buildx imagetools create --tag ${{ github.event.inputs.promoted_docker_image }} ${{ github.event.inputs.rc_docker_image }}
+      - name: Run CVE scan
+        uses: aquasecurity/trivy-action@master
+        if: always()
+        with:
+          image-ref: apache/kafka:${{ matrix.supported_image_tag }}
+          format: 'table'
+          severity: 'CRITICAL,HIGH'
+          output: scan_report_jvm_${{ matrix.supported_image_tag }}.txt
+          exit-code: '1'
+      - name: Upload CVE scan report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: scan_report_jvm_${{ matrix.supported_image_tag }}.txt
+          path: scan_report_jvm_${{ matrix.supported_image_tag }}.txt
